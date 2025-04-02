@@ -23,10 +23,11 @@ void loop() {
   Serial.print(" | Right: ");
   Serial.print(rightValue);
   Serial.print(" | Servo Position: ");
-  Serial.println(servoPos);
+  Serial.print(servoPos);
 
   int diff = leftValue - rightValue;  // คำนวณความแตกต่างของค่าแสง
-
+  Serial.print(" | diff: ");
+  Serial.println(diff);
   if (abs(diff) <= tolerance) {
     // แสงแดดอยู่ตรงกลาง -> เซอร์โวอยู่ที่ 90 องศา
     servoPos = 90;
