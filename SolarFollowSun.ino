@@ -12,6 +12,7 @@ void setup() {
   myServo.attach(servoPin);
   myServo.write(servoPos);  // กำหนดมุมเริ่มต้น
   Serial.begin(9600);
+  delay(3000);
 }
 
 void loop() {
@@ -22,32 +23,34 @@ void loop() {
   Serial.print(leftValue);
   Serial.print(" | Right: ");
   Serial.print(rightValue);
-  Serial.print(" | Servo Position: ");
-  Serial.print(servoPos);
 
-  int diff = leftValue - rightValue;  // คำนวณความแตกต่างของค่าแสง
+
+  int diff = rightValue - leftValue;  // คำนวณความแตกต่างของค่าแสง (สลับทิศ)
   Serial.print(" | diff: ");
-  Serial.println(diff);
+  Serial.print(diff);
+  Serial.print(" | Servo Position: ");
+  Serial.println(servoPos);
+
   if (abs(diff) <= tolerance) {
     // แสงแดดอยู่ตรงกลาง -> เซอร์โวอยู่ที่ 90 องศา
     servoPos = 90;
   } else if (diff > tolerance) {
-    // แสงมาทางซ้าย -> หมุนไปทางซ้าย (ตะวันตก)
-    if (diff > 200) {
-      servoPos = 30;  // หมุนไปทางซ้ายมาก
+    // แสงมาทางขวา (ขวาสว่างมากกว่า) -> หมุนไปทางขวา
+    if (diff > 50) {
+      servoPos = 150;
     } else if (diff > 100) {
-      servoPos = 60;  // หมุนไปทางซ้ายปานกลาง
+      servoPos = 120;
     } else {
-      servoPos = 75;  // หมุนไปทางซ้ายเล็กน้อย
+      servoPos = 105;
     }
   } else if (diff < -tolerance) {
-    // แสงมาทางขวา -> หมุนไปทางขวา (ตะวันออก)
-    if (diff < -200) {
-      servoPos = 150;  // หมุนไปทางขวามาก
-    } else if (diff < -100) {
-      servoPos = 120;  // หมุนไปทางขวาปานกลาง
+    // แสงมาทางซ้าย (ซ้ายสว่างมากกว่า) -> หมุนไปทางซ้าย
+    if (diff < 0) {
+      servoPos = 30;
+    } else if (diff < -50) {
+      servoPos = 60;
     } else {
-      servoPos = 105;  // หมุนไปทางขวาเล็กน้อย
+      servoPos = 75;
     }
   }
 
