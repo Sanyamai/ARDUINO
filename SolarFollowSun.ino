@@ -1,59 +1,41 @@
 #include <Servo.h>
 
-Servo myServo;
-const int ldrLeft = A0;   // LDR ซ้าย
-const int ldrRight = A1;  // LDR ขวา
-const int servoPin = 9;
-const int tolerance = 30;  // ค่าความแตกต่างที่ยอมรับได้
-
-int servoPos = 90;  // เริ่มต้นที่ 90 องศา
+Servo myservo;
+int L1, L2, x, degree = 90;
 
 void setup() {
-  myServo.attach(servoPin);
-  myServo.write(servoPos);  // กำหนดมุมเริ่มต้น
+  myservo.attach(9);
+  myservo.write(90);  // ตั้งค่าเริ่มต้น
   Serial.begin(9600);
   delay(3000);
 }
 
 void loop() {
-  int leftValue = analogRead(ldrLeft);    // อ่านค่า LDR ซ้าย
-  int rightValue = analogRead(ldrRight);  // อ่านค่า LDR ขวา
+  L1 = analogRead(A0);
+  L2 = analogRead(A1);
+  x = L1 - L2;
 
-  Serial.print("Left: ");
-  Serial.print(leftValue);
-  Serial.print(" | Right: ");
-  Serial.print(rightValue);
+  Serial.print("L1: ");
+  Serial.print(L1);
+  Serial.print(" | L2: ");
+  Serial.print(L2);
+  Serial.print(" | x: ");
+  Serial.print(x);
+
+  // ปรับค่ามุม degree ตามค่าความต่างของแสง
+  if (x < 80) degree--;
+  else if (x > 80) degree++;
 
 
-  int diff = rightValue - leftValue;  // คำนวณความแตกต่างของค่าแสง (สลับทิศ)
-  Serial.print(" | diff: ");
-  Serial.print(diff);
-  Serial.print(" | Servo Position: ");
-  Serial.println(servoPos);
+  // จำกัดค่าของ degree ให้อยู่ในช่วง 30 - 150 องศา
+  if (degree > 150) degree = 150;
+  if (degree < 30) degree = 30;
+  if ((x > 200) & (x < 300)) degree = 90 ;
 
-  if (abs(diff) <= tolerance) {
-    // แสงแดดอยู่ตรงกลาง -> เซอร์โวอยู่ที่ 90 องศา
-    servoPos = 90;
-  } else if (diff > tolerance) {
-    // แสงมาทางขวา (ขวาสว่างมากกว่า) -> หมุนไปทางขวา
-    if (diff > 50) {
-      servoPos = 150;
-    } else if (diff > 100) {
-      servoPos = 120;
-    } else {
-      servoPos = 105;
-    }
-  } else if (diff < -tolerance) {
-    // แสงมาทางซ้าย (ซ้ายสว่างมากกว่า) -> หมุนไปทางซ้าย
-    if (diff < 0) {
-      servoPos = 30;
-    } else if (diff < -50) {
-      servoPos = 60;
-    } else {
-      servoPos = 75;
-    }
-  }
 
-  myServo.write(servoPos);  // อัพเดตตำแหน่ง Servo
-  delay(200);               // หน่วงเวลาเพื่อป้องกันการแกว่งของเซอร์โว
+  myservo.write(degree);  // ส่งค่ามุมไปที่เซอร์โว
+
+  Serial.print(" | servo: ");
+  Serial.println(degree);
+  delay(100);
 }
